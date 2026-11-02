@@ -5,7 +5,7 @@ comma-separated keywords/product facts, a writing tone, and a customer segment.
 The Flask app sends a constrained prompt to a local Ollama model and displays
 the generated copy.
 
-![App layout with results]("/images/result.png")
+![App layout with results]("images/result.png")
 
 ## Requirements
 
