@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retail Copy Studio</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="eyebrow">LOCAL AI · RETAIL CONTENT</div>
+      <h1>Retail Copy Studio</h1>
+      <p>Turn product details into customer-focused e-commerce copy, powered by a local Ollama model.</p>
+    </header>
+
+    <section class="panel">
+      <form method="post">
+        <div class="field">
+          <label for="product_name">Product name</label>
+          <input id="product_name" name="product_name" maxlength="120"
+                 placeholder="e.g. Everyday Insulated Water Bottle"
+                 value="{{ form.product_name }}" required>
+        </div>
+
+        <div class="field">
+          <label for="keywords">Keywords or product facts <span class="optional">comma-separated</span></label>
+          <textarea id="keywords" name="keywords" rows="3" maxlength="1000"
+                    placeholder="e.g. 24 oz, stainless steel, leak-resistant lid, reusable">{{ form.keywords }}</textarea>
+          <small>Include only details you can substantiate. The model is instructed not to invent specifications or claims.</small>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label for="tone">Writing tone</label>
+            <select id="tone" name="tone">
+              {% for tone in tones %}
+                <option value="{{ tone }}" {% if form.tone == tone %}selected{% endif %}>{{ tone }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="segment">Target customer</label>
+            <select id="segment" name="segment">
+              {% for segment in segments %}
+                <option value="{{ segment }}" {% if form.segment == segment %}selected{% endif %}>{{ segment }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <button type="submit">Generate product description <span aria-hidden="true">→</span></button>
+      </form>
+    </section>
+
+    {% if error %}
+      <section class="message error" role="alert">
+        <strong>Something went wrong</strong>
+        <p>{{ error }}</p>
+      </section>
+    {% endif %}
+
+    {% if result %}
+      <section class="result panel">
+        <div class="result-heading">
+          <div>
+            <div class="eyebrow">GENERATED DESCRIPTION</div>
+            <h2>{{ form.product_name }}</h2>
+          </div>
+          <span class="model-tag">{{ model }}</span>
+        </div>
+        <p class="description">{{ result }}</p>
+        <button class="secondary" type="button" onclick="copyDescription()">Copy description</button>
+        <span id="copy-status" class="copy-status" aria-live="polite"></span>
+      </section>
+    {% endif %}
+
+    <footer>
+      <span>Runs locally with Ollama</span>
+      <span>Review AI-generated claims before publishing</span>
+    </footer>
+  </main>
+  {% if result %}
+  <script>
+    async function copyDescription() {
+      const text = {{ result|tojson }};
+      try {
+        await navigator.clipboard.writeText(text);
+        document.getElementById("copy-status").textContent = "Copied!";
+      } catch (e) {
+        document.getElementById("copy-status").textContent = "Clipboard access unavailable.";
+      }
+    }
+  </script>
+  {% endif %}
+</body>
+</html>
